@@ -65,7 +65,7 @@ public class InterpreteSQL {
 // PONERLE UN TRY CATCH ----------------
         File directorio = new File(rutaTrabajo);
         File[] archivos = directorio.listFiles();
-       csv.leerShow(archivos, rutaTrabajo);
+        csv.leerShow(archivos, rutaTrabajo);
 
     }
 

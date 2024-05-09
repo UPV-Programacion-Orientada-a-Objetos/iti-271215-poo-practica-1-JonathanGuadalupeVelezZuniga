@@ -8,27 +8,31 @@ public class ArchivosCSV {
 
     public void crearTabla(String nombreTabla, String[] columnas, String ruta){
 
+        String rutaF = ruta + "/";
         try {
 
-            File tablaW = new File(ruta, nombreTabla+".csv");
-            StringBuilder constCSV = new StringBuilder();
+            File tabla = new File(rutaF, nombreTabla);
+            StringBuilder colCSV = new StringBuilder();
 
             for (String col : columnas){
-                String[] colPartF = col.trim().split(" ");
-                String colName = colPartF[0];
+                String[] columPartes = col.trim().split(" ");
+                String columNombre = columPartes[0];
 
-                constCSV.append(colName).append(",");
+                colCSV.append(columNombre).append(",");
             }
-
-            constCSV. deleteCharAt(constCSV.length()-1);
+            colCSV.deleteCharAt(colCSV.length()-1);
             FileWriter write = new FileWriter(nombreTabla);
 
+
+
+        
 
         } catch (IOException e){
             e.printStackTrace();
         }
 
     }
+
 
     public void leerShow(File[] archivos, String rutaTrabajo){
 
