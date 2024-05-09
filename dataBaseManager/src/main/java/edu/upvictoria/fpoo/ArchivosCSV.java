@@ -1,36 +1,50 @@
 package edu.upvictoria.fpoo;
 
 import javax.swing.JOptionPane;
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.*;
 
 public class ArchivosCSV {
 
-    private BufferedReader lector; //leer
-    private String linea; //Recibe linea de fila
-    private String partes[] = null; //Almacena cada linea leida
 
-    public void leerArchivo(String nombreArchivo){
-        try{
-            lector = new BufferedReader(new FileReader(nombreArchivo));
-            while ((linea = lector.readLine()) != null){
-                partes = linea.split(",");
-                imprimirLinea();
-                System.out.println();
+    public void crearTabla(String nombreTabla, String[] columnas, String ruta){
+
+        try {
+
+            File tablaW = new File(ruta, nombreTabla+".csv");
+            StringBuilder constCSV = new StringBuilder();
+
+            for (String col : columnas){
+                String[] colPartF = col.trim().split(" ");
+                String colName = colPartF[0];
+
+                constCSV.append(colName).append(",");
             }
-            lector.close();
-            linea = null;
-            partes= null;
-        } catch(Exception e){
-            JOptionPane.showMessageDialog(null,e);
+
+            constCSV. deleteCharAt(constCSV.length()-1);
+            FileWriter write = new FileWriter(nombreTabla);
+
+
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public void leerShow(File[] archivos, String rutaTrabajo){
+
+        if(archivos != null){
+            System.out.println("Tablas en la ruta de trabajo: " + rutaTrabajo);
+            for (File archivo : archivos){
+                if(archivo.isFile() && archivo.getName().endsWith(".csv")){
+                    System.out.println("- " + archivo.getName().replace(".csv", " "));
+                }else {
+                    System.out.println("No se encontraron tablas en la ruta de trabajo: " + rutaTrabajo);
+                }
+            }
         }
     }
 
-    public void imprimirLinea(){
-        for (int i = 0; i < partes.length; i++ ){
-            System.out.println(partes[i]+" | ");
-        }
-    }
+
 
 
 

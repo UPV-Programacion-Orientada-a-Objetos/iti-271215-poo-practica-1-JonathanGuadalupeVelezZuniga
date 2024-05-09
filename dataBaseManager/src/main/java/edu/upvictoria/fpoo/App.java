@@ -20,10 +20,9 @@ public class App
 
 
             System.out.print("SQL>");
-            String sentencia = bufer.readLine();
-
-
-            interpreteSQL.sentenciaSQL(sentencia);
+            interpreteSQL.setSentencia(bufer.readLine());
+            String sql = interpreteSQL.getSentencia();
+            interpreteSQL.sentenciaSQL(sql);
             }
         }catch (IOException e){
             e.printStackTrace();
@@ -37,13 +36,6 @@ public class App
         }
 
 
-        //---------LEER
-        /*
-          ArchivosCSV archivo = new ArchivosCSV();
-
-        archivo.leerArchivo("/home/jonathan-velez/Documentos/POLITECNICA/6 CUATRIMESTRE/POO/U1/BASE DE DATOS/prueba1.csv");
-
-          */
 
 
 
