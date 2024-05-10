@@ -9,7 +9,6 @@ public class InterpreteSQL {
 
     private String rutaTrabajo;
     private String sentenciaSql;
-    BufferedReader bufer = new BufferedReader(new InputStreamReader(System.in));
 
 
 //--------------COMANDOS
@@ -19,10 +18,10 @@ public class InterpreteSQL {
 
         if ((matcher = Pattern.compile("^USE (.+);$", Pattern.CASE_INSENSITIVE).matcher(sentencia)).find()) {
             String rutaNueva = matcher.group(1);
-            if(validar(rutaNueva)){
+            if (validar(rutaNueva)) {
                 use(rutaNueva);
 
-            }else {
+            } else {
                 System.out.println("ERROR. El diredtorio no existe");
             }
 
@@ -34,20 +33,28 @@ public class InterpreteSQL {
         } else if ((matcher = Pattern.compile("^\\s*CREATE\\s+TABLE\\s+[a-zA-Z_][a-zA-Z0-9_]*\\s*\\(.*\\)\\s*;$", Pattern.CASE_INSENSITIVE).matcher(sentencia)).find()) {
             createTAble(sentencia);
 
-        } else if ((matcher = Pattern.compile("SELECT\\s+\\*\\s+FROM (.+);$", Pattern.CASE_INSENSITIVE).matcher(sentencia)).find()) {
+        } else if ((matcher = Pattern.compile("^SELECT\\s+(\\*|\\w+)\\s+FROM\\s+(\\w+);$", Pattern.CASE_INSENSITIVE).matcher(sentencia)).find()) {
             String nombre = matcher.group(1);
             String columnas = matcher.group(2);
-            select(sentencia);
+            select(nombre, columnas);
         } else if ((matcher = Pattern.compile("DROP TABLE\\s+(\\w+);$", Pattern.CASE_INSENSITIVE).matcher(sentencia)).find()) {
             dropTable(sentencia);
         } else if ((matcher = Pattern.compile("^DELETE\\s+FROM\\s+[a-zA-Z_][a-zA-Z0-9_]*\\s*(?:WHERE\\s+.+)?$", Pattern.CASE_INSENSITIVE).matcher(sentencia)).find()) {
-            delete(sentencia);
+            delete(sentencia); // Falta crear metodo
+        } else if ((matcher = Pattern.compile("^INSERT INTO (\\w+) \\((.+)\\) VALUES \\((.+)\\);$", Pattern.CASE_INSENSITIVE).matcher(sentencia)).find()) {
+            String nombreTabla = matcher.group(1);
+            String columnas = matcher.group(2);
+            String valores = matcher.group(3);
+            insertInto(nombreTabla, columnas.split(","), valores.split(","));
+
         } else {
             System.out.println("Sintaxis incorrecta");
         }
-
-
     }
+    //Falta crear UPDATE, Where conditional, and y or
+
+
+
 
 
 //------------ Funciones de comandos
@@ -99,15 +106,55 @@ public class InterpreteSQL {
         }
     }
 
-    public void select(String selectTable) {
-        if (rutaTrabajo != null){
+    public void select(String colum, String nomTabla) {
+        if (rutaTrabajo != null) {
+            String rutaF = rutaTrabajo + "/" + nomTabla + ".csv";
+            File tablaRuta = new File(rutaF);
 
-        }else{
+            if (tablaRuta.isFile() && tablaRuta.exists() && tablaRuta.getName().endsWith(".csv")) {
+                try (BufferedReader buffer = new BufferedReader(new FileReader(tablaRuta))) {
+                    String[] columnas = buffer.readLine().split(",");
+                    int columnIndex = -1;
+
+                    if (colum.equals("*")) {
+                        for (String columna : columnas) {
+                            System.out.print(columna + "\t");
+                        }
+                        System.out.println();
+                    } else {
+                        String[] selectedColumns = colum.split(",");
+                        for (String colSeleccionadas : selectedColumns) {
+                            for (int i = 0; i < columnas.length; i++) {
+                                if (columnas[i].equals(colSeleccionadas)) {
+                                    columnIndex = i;
+                                    System.out.print(columnas[i] + "\t");
+                                    break;
+                                }
+                            }
+                        }
+                        System.out.println();
+                    }
+
+                    String valores;
+                    while ((valores = buffer.readLine()) != null) {
+                        String[] valor = valores.split(",");
+                        for (String val : valor) {
+                            System.out.print(val+ "\t");
+                        }
+                        System.out.println();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("La tabla no existe en la ruta de trabajo: " + rutaTrabajo);
+            }
+        } else {
             System.out.println("No se ha elegido la ruta de trabajo");
         }
-
-
     }
+
+
 
     public void dropTable(String dropTable) {
         if (rutaTrabajo != null){
@@ -121,7 +168,8 @@ public class InterpreteSQL {
                 try {
 
 
-                System.out.println("¿Realmente deseas borrar la tabla? s = si/n = no");
+                    BufferedReader bufer = new BufferedReader(new InputStreamReader(System.in));
+                    System.out.println("¿Realmente deseas borrar la tabla? s = si/n = no");
                 String res = bufer.readLine().trim().toLowerCase();
 
                 if (res.equals("s")){
@@ -146,6 +194,44 @@ public class InterpreteSQL {
     public void delete(String delete){
         System.out.println("La sentencia ha sido borrado");
     }
+
+    public void insertInto(String tablaNombre, String[] columna, String[] valores){
+        if(rutaTrabajo != null){
+
+
+        String rutaArchivo = rutaTrabajo + "/" + tablaNombre + ".csv";
+        File tabla = new File(rutaArchivo);
+
+        if(!tabla.exists()){
+                System.out.println("La tabla ingresada no existe en el directorio: " + rutaArchivo);
+                return;
+            }
+
+
+
+
+        try (FileWriter writer = new FileWriter(rutaArchivo, true)) {
+            StringBuilder linea = new StringBuilder();
+            for (int i = 0; i < columna.length; i++) {
+                if (i > 0) {
+                    linea.append(",");
+                }
+                linea.append(valores[i]);
+            }
+            writer.append(linea.toString()).append("\n");
+            System.out.println("Se ha insertado una fila en la tabla " + tablaNombre);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        }else{
+            System.out.println("No se ha ingresado una ruta de trabajo");
+        }
+
+    }
+
+
+
+
 
 
 
