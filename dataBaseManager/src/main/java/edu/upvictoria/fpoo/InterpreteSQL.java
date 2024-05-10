@@ -72,7 +72,8 @@ public class InterpreteSQL {
     //........
     public void showTable(String mostrarTablas) {
 
-// PONERLE UN TRY CATCH ----------------
+
+
         if (rutaTrabajo != null){
             File directorio = new File(rutaTrabajo);
             File[] archivos = directorio.listFiles();
@@ -80,6 +81,8 @@ public class InterpreteSQL {
         }else{
             System.out.println("No se ha elegido una ruta de trabajo.");
         }
+
+
 
     }
 
@@ -107,33 +110,43 @@ public class InterpreteSQL {
     }
 
     public void select(String colum, String nomTabla) {
+
         if (rutaTrabajo != null) {
             String rutaF = rutaTrabajo + "/" + nomTabla + ".csv";
             File tablaRuta = new File(rutaF);
 
             if (tablaRuta.isFile() && tablaRuta.exists() && tablaRuta.getName().endsWith(".csv")) {
+
+
                 try (BufferedReader buffer = new BufferedReader(new FileReader(tablaRuta))) {
                     String[] columnas = buffer.readLine().split(",");
                     int columnIndex = -1;
 
                     if (colum.equals("*")) {
+
+
                         for (String columna : columnas) {
                             System.out.print(columna + "\t");
                         }
                         System.out.println();
+
+
                     } else {
                         String[] selectedColumns = colum.split(",");
                         for (String colSeleccionadas : selectedColumns) {
+
                             for (int i = 0; i < columnas.length; i++) {
+
+
                                 if (columnas[i].equals(colSeleccionadas)) {
                                     columnIndex = i;
                                     System.out.print(columnas[i] + "\t");
                                     break;
+                                    }
                                 }
-                            }
                         }
                         System.out.println();
-                    }
+                         }
 
                     String valores;
                     while ((valores = buffer.readLine()) != null) {
@@ -146,9 +159,14 @@ public class InterpreteSQL {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+
+
             } else {
                 System.out.println("La tabla no existe en la ruta de trabajo: " + rutaTrabajo);
             }
+
+
         } else {
             System.out.println("No se ha elegido la ruta de trabajo");
         }
@@ -160,10 +178,17 @@ public class InterpreteSQL {
         if (rutaTrabajo != null){
         Matcher match;
         Pattern pattern = Pattern.compile("DROP TABLE (\\w+);$",Pattern.CASE_INSENSITIVE);
+
         match = pattern.matcher(dropTable);
+
+
+
         if (match.find()) {
+
             String nombreTabla = match.group(1) + ".csv";
             File directorio = new File(rutaTrabajo + "/" + nombreTabla);
+
+
             if (directorio.exists()) {
                 try {
 
@@ -175,17 +200,25 @@ public class InterpreteSQL {
                 if (res.equals("s")){
                 if (directorio.delete()) {
                     System.out.println("Ha sido borrado la tabla " + match.group(1));
+
+
                 } else {
+
                     System.out.println("No se pudo borrar la tabla");
                 }}else if( res.equals("n")){
                     System.out.println("Se ha cancelado la operacion");
+
+
                 }
                 } catch (IOException e){
                     e.printStackTrace();
                 }
+
+
             } else {
                 System.out.println("La tabla no existe");
             }
+
         }}else {
             System.out.println("No se ha elegido la ruta de trabajo");
         }
@@ -202,7 +235,9 @@ public class InterpreteSQL {
         String rutaArchivo = rutaTrabajo + "/" + tablaNombre + ".csv";
         File tabla = new File(rutaArchivo);
 
+
         if(!tabla.exists()){
+
                 System.out.println("La tabla ingresada no existe en el directorio: " + rutaArchivo);
                 return;
             }
@@ -211,6 +246,7 @@ public class InterpreteSQL {
 
 
         try (FileWriter writer = new FileWriter(rutaArchivo, true)) {
+
             StringBuilder linea = new StringBuilder();
             for (int i = 0; i < columna.length; i++) {
                 if (i > 0) {
@@ -218,9 +254,12 @@ public class InterpreteSQL {
                 }
                 linea.append(valores[i]);
             }
+
             writer.append(linea.toString()).append("\n");
             System.out.println("Se ha insertado una fila en la tabla " + tablaNombre);
+
         } catch (IOException e) {
+
             e.printStackTrace();
         }
         }else{
