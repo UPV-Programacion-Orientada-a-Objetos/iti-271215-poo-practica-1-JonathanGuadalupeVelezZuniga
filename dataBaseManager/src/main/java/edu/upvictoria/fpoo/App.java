@@ -19,10 +19,10 @@ public class App
             while (true){
 
 
-            System.out.print("SQL>");
-            interpreteSQL.setSentencia(bufer.readLine());
-            String sql = interpreteSQL.getSentencia();
-            interpreteSQL.sentenciaSQL(sql);
+                System.out.print("SQL>");
+                interpreteSQL.setSentencia(bufer.readLine());
+                String sql = interpreteSQL.getSentencia();
+                interpreteSQL.sentenciaSQL(sql);
             }
         }catch (IOException e){
             e.printStackTrace();
@@ -41,3 +41,5 @@ public class App
 
     }
 }
+
+
